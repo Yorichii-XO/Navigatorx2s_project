@@ -7,63 +7,51 @@ use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
-   // Display a listing of roles
-   public function index()
-   {
-       $roles = Role::all();
-       return response()->json($roles);
-   }
+    // Display a listing of roles
+    public function index()
+    {
+        $roles = Role::all();
+        return response()->json($roles);
+    }
 
-   // Show the form for creating a new role
-   public function create()
-   {
-       return view('roles.create');
-   }
+    // Store a newly created role in storage
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:roles,name',
+        ]);
 
-   // Store a newly created role in storage
-   public function store(Request $request)
-   {
-       $validated = $request->validate([
-           'name' => 'required|string|max:255|unique:roles,name',
-       ]);
+        $role = Role::create([
+            'name' => $validated['name'],
+        ]);
 
-       Role::create([
-           'name' => $validated['name'],
-       ]);
+        return response()->json($role, 201); // Return the created role with a 201 status
+    }
 
-       return redirect()->route('roles.index');
-   }
+    // Display the specified role
+    public function show(Role $role)
+    {
+        return response()->json($role);
+    }
 
-   // Display the specified role
-   public function show(Role $role)
-   {
-       return response()->json($role);
-   }
+    // Update the specified role in storage
+    public function update(Request $request, Role $role)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
+        ]);
 
-   // Show the form for editing the specified role
-   public function edit(Role $role)
-   {
-       return view('roles.edit', compact('role'));
-   }
+        $role->update([
+            'name' => $validated['name'],
+        ]);
 
-   // Update the specified role in storage
-   public function update(Request $request, Role $role)
-   {
-       $validated = $request->validate([
-           'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
-       ]);
+        return response()->json($role);
+    }
 
-       $role->update([
-           'name' => $validated['name'],
-       ]);
-
-       return redirect()->route('roles.index');
-   }
-
-   // Remove the specified role from storage
-   public function destroy(Role $role)
-   {
-       $role->delete();
-       return redirect()->route('roles.index');
-   }
+    // Remove the specified role from storage
+    public function destroy(Role $role)
+    {
+        $role->delete();
+        return response()->json(null, 204); // Return a 204 status for successful deletion with no content
+    }
 }

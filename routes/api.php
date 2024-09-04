@@ -3,6 +3,7 @@
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TimeEntryController;
+use App\Http\Controllers\UrlVisitController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -33,3 +34,11 @@ Route::middleware('auth:sanctum')->get('/time-entries', [TimeEntryController::cl
 // Notification routes
 Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
 Route::middleware('auth:sanctum')->post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+// Apply Sanctum authentication middleware to the routes
+Route::middleware('auth:sanctum')->prefix('url-visits')->group(function () {
+    Route::get('/', [UrlVisitController::class, 'index']);
+    Route::post('/', [UrlVisitController::class, 'store']);
+    Route::get('/{id}', [UrlVisitController::class, 'show']);
+    Route::put('/{id}', [UrlVisitController::class, 'update']);
+    Route::delete('/{id}', [UrlVisitController::class, 'destroy']);
+});

@@ -13,8 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('urls', function (Blueprint $table) {
+        Schema::create('url_visits', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Assumes a 'users' table exists
+            $table->foreignId('category_id')->constrained()->onDelete('cascade'); // Add this line
+            $table->string('url');
+            $table->timestamp('visit_time');
+            $table->integer('duration'); // Duration in seconds
             $table->timestamps();
         });
     }
@@ -26,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('urls');
+        Schema::dropIfExists('url_visits');
     }
 };

@@ -7,20 +7,49 @@ use Illuminate\Http\Request;
 
 class ActivityController extends Controller
 {
+    public function index()
+    {
+        $activities = Activity::all();
+        return response()->json($activities);
+    }
+
     public function store(Request $request)
     {
-        $activity = Activity::create([
-            'user_id' => $request->user()->id,
-            'activity_type' => $request->activity_type,
-            'details' => $request->details,
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'type' => 'required|string',
+            'start_time' => 'required|date',
+            'end_time' => 'required|date',
         ]);
 
+        $activity = Activity::create($request->all());
         return response()->json($activity, 201);
     }
 
-    public function index(Request $request)
+    public function show($id)
     {
-        $activities = Activity::where('user_id', $request->user()->id)->get();
-        return response()->json($activities);
+        $activity = Activity::findOrFail($id);
+        return response()->json($activity);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'type' => 'required|string',
+            'start_time' => 'required|date',
+            'end_time' => 'required|date',
+        ]);
+
+        $activity = Activity::findOrFail($id);
+        $activity->update($request->all());
+        return response()->json($activity);
+    }
+
+    public function destroy($id)
+    {
+        $activity = Activity::findOrFail($id);
+        $activity->delete();
+        return response()->json(null, 204);
     }
 }

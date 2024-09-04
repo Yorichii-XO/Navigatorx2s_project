@@ -5,18 +5,24 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Activity extends Model
+class UrlVisit extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'user_id',
-        'type',
-        'start_time',
-        'end_time',
+        'category_id',
+        'url',
+        'visit_time',
+        'duration',
     ];
 
-    // Define the relationship with the User model
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    // Optionally, define the relationship with the User model
     public function user()
     {
         return $this->belongsTo(User::class);
