@@ -51,10 +51,17 @@ class UserController extends Controller
   // Show the form for editing the specified user
   public function edit(User $user)
   {
+      // Fetch all roles
       $roles = Role::all();
-      return view('users.edit', compact('user', 'roles'));
+  
+      // Return JSON response with user and roles data
+      return response()->json([
+          'user' => $user,
+          'roles' => $roles,
+      ]);
   }
-
+  
+  
   // Update the specified user in storage
   public function update(Request $request, User $user)
   {

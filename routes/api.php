@@ -1,9 +1,13 @@
 <?php
 
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\ApiController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\TimeEntryController;
 use App\Http\Controllers\UrlVisitController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,10 +21,15 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-// users routes
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::post('/register', [RegisterController::class, 'register']);
+Route::post('/login', [ApiController::class, 'login']);
+//Users
+Route::middleware('auth:sanctum')->get('/users', [UserController::class, 'index']);
+Route::middleware('auth:sanctum')->get('/users/{user}/edit', [UserController::class, 'edit']);
+
+//Roles
+Route::get('/roles', [RoleController::class, 'index']);
+
 // Activity routes
 Route::middleware('auth:sanctum')->post('/activities', [ActivityController::class, 'store']);
 Route::middleware('auth:sanctum')->get('/activities', [ActivityController::class, 'index']);
