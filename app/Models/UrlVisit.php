@@ -11,7 +11,6 @@ class UrlVisit extends Model
 
     protected $fillable = [
         'user_id',
-        'category_id',
         'url',
         'visit_time',
         'duration',

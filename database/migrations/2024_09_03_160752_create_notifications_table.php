@@ -15,10 +15,15 @@ return new class extends Migration
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('message');
+            $table->unsignedBigInteger('user_id');
+            $table->string('type');
+            $table->string('email')->nullable();
+            $table->text('data'); // Can store notification details in JSON format
             $table->boolean('read')->default(false);
             $table->timestamps();
+
+            // Foreign key constraint
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

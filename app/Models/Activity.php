@@ -11,9 +11,11 @@ class Activity extends Model
 
     protected $fillable = [
         'user_id',
-        'type',
+        'browser',
         'start_time',
         'end_time',
+        'duration',
+        'member_id'
     ];
 
     // Define the relationship with the User model
@@ -21,4 +23,12 @@ class Activity extends Model
     {
         return $this->belongsTo(User::class);
     }
+   
+    
+    // In Activity.php model
+public function member()
+{
+    return $this->belongsTo(Member::class, 'member_id','id');
+}
+
 }

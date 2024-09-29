@@ -14,12 +14,16 @@ return new class extends Migration
     public function up()
     {
         Schema::create('activities', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->string('type');
-            $table->timestamp('start_time');
-            $table->timestamp('end_time');
-            $table->timestamps();
+                $table->id();
+                $table->foreignId('user_id')->constrained()->onDelete('cascade'); // The user who performed the activity
+                $table->foreignId('member_id')->nullable()->constrained('members')->onDelete('cascade'); // Nullable for users who are not members
+                $table->string('browser');
+                $table->timestamp('start_time');
+                $table->timestamp('end_time')->nullable();
+                $table->string('duration')->nullable(); // Duration in seconds
+                $table->timestamps();
+            
+            
         });
     }
 

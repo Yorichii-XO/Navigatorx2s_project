@@ -16,10 +16,10 @@ return new class extends Migration
         Schema::create('url_visits', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // Assumes a 'users' table exists
-            $table->foreignId('category_id')->constrained()->onDelete('cascade'); // Add this line
             $table->string('url');
-            $table->timestamp('visit_time');
-            $table->integer('duration'); // Duration in seconds
+            $table->timestamp('visit_time')->nullable();
+            $table->integer('duration')->nullable();
+            $table->text('screenshot')->nullable();
             $table->timestamps();
         });
     }
