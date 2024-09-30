@@ -45,7 +45,7 @@ Route::middleware('auth:sanctum')->post('/activities/analyzeUrl', [ActivityContr
 Route::middleware('auth:sanctum')->get('/activities', [ActivityController::class, 'index']);
 Route::delete('/activities/{id}', [ActivityController::class, 'delete'])->middleware('auth:sanctum');
 Route::middleware('auth:sanctum')->get('/activities/{id}', [ActivityController::class, 'show']);
-Route::get('/activities', [ActivityController::class, 'showUserActivities']); // Fetch user's activities
+Route::get('/youractivities', [ActivityController::class, 'showUserActivities']); // Fetch user's activities
 
 Route::post('/logout', [ApiController::class, 'logout'])->middleware('auth:sanctum');
 
@@ -61,14 +61,13 @@ Route::middleware('auth:sanctum')->get('/time-entries', [TimeEntryController::cl
 Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
 Route::middleware('auth:sanctum')->post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
 // Apply Sanctum authentication middleware to the routes
-Route::middleware('auth:sanctum')->prefix('url-visits')->group(function () {
-    Route::get('/', [UrlVisitController::class, 'index']);
-    Route::post('/', [UrlVisitController::class, 'store']);
-    Route::get('/{id}', [UrlVisitController::class, 'show']);
-    Route::put('/{id}', [UrlVisitController::class, 'update']);
-    Route::delete('/{id}', [UrlVisitController::class, 'destroy']);
-});
-Route::apiResource('url-visits', UrlVisitController::class)->middleware('auth:sanctum');
+
+Route::delete('/url-visits/{id}', [UrlVisitController::class, 'destroy'])->middleware('auth:sanctum');
+Route::post('/url-visits', [UrlVisitController::class, 'store']);
+Route::get('/url-visits', [UrlVisitController::class, 'index'])->middleware('auth:sanctum');
+Route::post('/url-analyze', [UrlVisitController::class, 'analyzeUrl'])->middleware('auth:sanctum');
+
+
 Route::get('/members', [MemberController::class, 'index'])->middleware('auth:sanctum');
 Route::post('/invite', [InvitationController::class, 'invite'])->middleware('auth:sanctum');
 Route::get('/invitations', [InvitationController::class, 'index'])->middleware('auth:sanctum');
@@ -80,7 +79,8 @@ Route::middleware('auth:sanctum')->post('/invitations/{id}/accept', [InvitationC
  Route::delete('/invitations/{id}', [InvitationController::class, 'deleteInvitation'])->middleware('auth:sanctum');
 
  Route::middleware('auth:sanctum')->get('/members', [MemberController::class, 'index']);
- 
+ Route::post('/members', [MemberController::class, 'store']);
+
  Route::middleware('auth:sanctum')->group(function () {
     Route::get('members/{id}', [MemberController::class, 'edit']);
     Route::put('members/{id}', [MemberController::class, 'update']);

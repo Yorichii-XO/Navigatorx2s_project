@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\UrlVisit;
 use App\Models\Category;
+use Dotenv\Validator;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 
@@ -78,24 +79,24 @@ class UrlVisitController extends Controller
     }
 
  
-        public function store(Request $request)
-        {
-            $request->validate([
-                'url' => 'required|url',
-                'screenshot' => 'required|string',
-            ]);
-    
-            // Store the URL visit in the database
-            $urlVisit = UrlVisit::create([
-                'user_id' => auth()->id(), // Get the authenticated user ID
-                'url' => $request->input('url'),
-                'screenshot' => $request->input('screenshot'),
-                'visit_time' => now(),
-                'duration' => 0, // Set default duration if needed
-            ]);
-    
-            return response()->json($urlVisit, 201);
-        }
+    public function store(Request $request)
+    {
+        // Validate the incoming request
+        $request->validate([
+            'url' => 'required|url',
+            'screenshot' => 'required|string',
+        ]);
+
+
+        // Create a new UrlVisit record
+        $urlVisit = UrlVisit::create([
+            'url' => $request->url,
+            'screenshot' => $request->screenshot,
+        ]);
+
+        return response()->json(['message' => 'URL visit stored successfully', 'data' => $urlVisit], 201);
+    }
+
     
     public function show($id)
     {
@@ -124,4 +125,6 @@ class UrlVisitController extends Controller
         $urlVisit->delete();
         return response()->json(null, 204);
     }
+
+
 }

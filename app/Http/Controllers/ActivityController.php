@@ -62,7 +62,7 @@ class ActivityController extends Controller
         try {
             // Find the activity by ID, including the related user
             $activity = Activity::with('user')->findOrFail($id);
-    
+
             return response()->json($activity, 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             // Return a 404 error if the activity is not found
@@ -72,7 +72,7 @@ class ActivityController extends Controller
             return response()->json(['error' => 'Failed to retrieve activity.'], 500);
         }
     }
-    
+
     private function getVirusTotalReport($url)
     {
         try {
@@ -111,20 +111,20 @@ class ActivityController extends Controller
     public function start(Request $request)
     {
         Log::info('Start activity called', ['user_id' => $request->user()->id]);
-    
+
         $userAgent = $request->header('User-Agent');
         $browser = $this->getBrowserName($userAgent);
-    
+
         // Validate the incoming request (no need to validate member_id if we will determine it in the method)
         $validatedData = $request->validate([
             // Other validation rules if necessary
         ]);
-    
+
         $userId = $request->user()->id;
-    
+
         // Check if the user is a member and get member_id
         $member = Member::where('user_id', $userId)->first();
-        
+
         if ($member) {
             Log::info('Member found', ['member_id' => $member->id]);
             $memberId = $member->id; // Get member_id if the member exists
@@ -132,7 +132,7 @@ class ActivityController extends Controller
             Log::info('No member found for user', ['user_id' => $userId]);
             $memberId = null; // Set to null if not a member
         }
-    
+
         try {
             // Create a new activity for the authenticated user
             $activity = Activity::create([
@@ -142,9 +142,9 @@ class ActivityController extends Controller
                 'start_time' => now(),
                 'end_time' => null, // Set end_time to null initially
             ]);
-    
+
             Log::info('Activity started successfully', ['activity_id' => $activity->id]);
-    
+
             // Return all relevant attributes of the created activity
             return response()->json($activity->only([
                 'id',
@@ -165,55 +165,55 @@ class ActivityController extends Controller
             return response()->json(['error' => 'Failed to start activity.'], 500);
         }
     }
-    
 
-    
 
-// Stop an ongoing activity
-// Stop an ongoing activity
-public function stop(Request $request, $id)
-{
-    try {
-        // Fetch the ongoing activity for the user
-        $activity = Activity::where('user_id', $request->user()->id)
-                            ->whereNull('end_time') // Ensure it's not already stopped
-                            ->findOrFail($id);
-    
-        // Update the end_time to mark it as stopped
-        $activity->end_time = now(); // Use the current time for end_time
-        $activity->save(); // Save the changes
 
-        // Calculate duration
-        $startTime = $activity->start_time;
-        $endTime = $activity->end_time; // This now has the correct end_time
-        $duration = $endTime->diff($startTime); // Get the duration as a DateInterval
 
-        // Update duration in the activity record
-        $activity->duration = $duration->format('%h h %i m %s s');
-        $activity->save(); // Save the updated duration
+    // Stop an ongoing activity
+    // Stop an ongoing activity
+    public function stop(Request $request, $id)
+    {
+        try {
+            // Fetch the ongoing activity for the user
+            $activity = Activity::where('user_id', $request->user()->id)
+                ->whereNull('end_time') // Ensure it's not already stopped
+                ->findOrFail($id);
 
-        Log::info('Activity stopped', ['activity_id' => $activity->id]);
-    
-        // Return all relevant attributes of the updated activity, including member_id
-        return response()->json($activity->only([
-            'id',
-            'user_id',
-            'member_id', // Include member_id in the response
-            'browser',
-            'start_time',
-            'end_time',
-            'duration',
-            'created_at',
-            'updated_at'
-        ]), 200);
-    } catch (\Exception $e) {
-        Log::error('Error stopping activity', [
-            'error' => $e->getMessage(),
-            'activity_id' => $id
-        ]);
-        return response()->json(['error' => 'Failed to stop activity.'], 500);
+            // Update the end_time to mark it as stopped
+            $activity->end_time = now(); // Use the current time for end_time
+            $activity->save(); // Save the changes
+
+            // Calculate duration
+            $startTime = $activity->start_time;
+            $endTime = $activity->end_time; // This now has the correct end_time
+            $duration = $endTime->diff($startTime); // Get the duration as a DateInterval
+
+            // Update duration in the activity record
+            $activity->duration = $duration->format('%h h %i m %s s');
+            $activity->save(); // Save the updated duration
+
+            Log::info('Activity stopped', ['activity_id' => $activity->id]);
+
+            // Return all relevant attributes of the updated activity, including member_id
+            return response()->json($activity->only([
+                'id',
+                'user_id',
+                'member_id', // Include member_id in the response
+                'browser',
+                'start_time',
+                'end_time',
+                'duration',
+                'created_at',
+                'updated_at'
+            ]), 200);
+        } catch (\Exception $e) {
+            Log::error('Error stopping activity', [
+                'error' => $e->getMessage(),
+                'activity_id' => $id
+            ]);
+            return response()->json(['error' => 'Failed to stop activity.'], 500);
+        }
     }
-}
 
 
     // Save URL visit information
@@ -225,8 +225,8 @@ public function stop(Request $request, $id)
         try {
             // Fetch the ongoing activity for the user
             $activity = Activity::where('user_id', $request->user()->id)
-                                ->whereNull('end_time')
-                                ->findOrFail($id);
+                ->whereNull('end_time')
+                ->findOrFail($id);
 
             // Store URLs in an array or a JSON column
             $urls = $activity->urls ?? [];
@@ -281,40 +281,41 @@ public function stop(Request $request, $id)
     {
         // Get the authenticated user's ID and active status
         $userId = $request->user()->id;
-        $userStatus = $request->user()->is_active; 
-    
+        $userStatus = $request->user()->is_active;
+
         // Get the members invited by the authenticated user
         $invitedMembers = Member::where('invited_by', $userId)->pluck('id')->toArray();
-    
+
         // Log the IDs of invited members for debugging
         Log::info('Invited Members IDs:', $invitedMembers);
-    
+
         // Fetch activities for those members or users without members (if necessary)
         $activities = Activity::whereIn('member_id', $invitedMembers)
             ->orWhereNull('member_id')
             ->with(['member:id,name', 'user:id,name,is_active'])
             ->get();
-    
+
         // Log the fetched activities for debugging
         Log::info('Fetched Activities:', $activities->toArray());
-    
+
         // Format the response to include member name and their active status
         $formattedActivities = $activities->map(function ($activity) use ($userStatus) {
             $member = $activity->member; // Get the member object
             $memberName = $member ? $member->name : 'Unknown'; // Default to 'Unknown' if member is null
-    
+            $user = $activity->user->is_active; // Get the member object
+
             // Log the member name and active status for each activity
             Log::info('Activity Member Info:', [
                 'member_name' => $memberName,
-              
+                'is_active' => $user,
             ]);
-    
+
             return [
                 'id' => $activity->id,
                 'user_id' => $activity->user_id,
                 'member_id' => $activity->member_id,
                 'member_name' => $memberName,
-                'user_is_active' => $userStatus, // Include user's active status
+                'user_is_active' => $user, // Include user's active status
                 'browser' => $activity->browser,
                 'start_time' => $activity->start_time,
                 'end_time' => $activity->end_time,
@@ -323,43 +324,40 @@ public function stop(Request $request, $id)
                 'updated_at' => $activity->updated_at,
             ];
         });
-    
+
         // Return the formatted response
         return response()->json($formattedActivities);
     }
-    
 
-    
-    
-public function delete($id)
-{
-    try {
-        // Find the activity by ID
-        $activity = Activity::findOrFail($id);
-        
-        // Delete the activity
-        $activity->delete();
-        
-        return response()->json(['message' => 'Activity deleted successfully.'], 200);
-    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-        return response()->json(['error' => 'Activity not found.'], 404);
-    } catch (\Exception $e) {
-        return response()->json(['error' => 'Failed to delete activity.'], 500);
+
+
+
+    public function delete($id)
+    {
+        try {
+            // Find the activity by ID
+            $activity = Activity::findOrFail($id);
+
+            // Delete the activity
+            $activity->delete();
+
+            return response()->json(['message' => 'Activity deleted successfully.'], 200);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'Activity not found.'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to delete activity.'], 500);
+        }
     }
-}
-public function showUserActivities(Request $request)
-{
-    // Get the authenticated user's ID
-    $userId = $request->user()->id;
+    public function showUserActivities(Request $request)
+    {
+        // Get the authenticated user's ID
+        $userId = $request->user()->id;
 
-    // Fetch activities for the authenticated user
-    $activities = Activity::where('user_id', $userId)
-        ->with(['member:id,name']) // Load related member's name (adjust as necessary)
-        ->get();
+        // Fetch activities for the authenticated user
+        $activities = Activity::where('user_id', $userId)
+            ->with(['member:id,name']) // Load related member's name (adjust as necessary)
+            ->get();
 
-    return response()->json($activities);
-
-}
-
-
+        return response()->json($activities);
+    }
 }

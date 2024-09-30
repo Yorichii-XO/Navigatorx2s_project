@@ -75,7 +75,6 @@ class InvitationController extends Controller
         // Validate the incoming request
         $validated = $request->validate([
             'role_id' => 'required|exists:roles,id', // Assuming you have a roles table
-            'is_active' => 'required|boolean',
         ]);
     
         try {
@@ -100,7 +99,6 @@ class InvitationController extends Controller
                 'email' => $invitation->email,           // Assuming you have the email in the invitation
                 'password' => $authenticatedUser->password, // Password from the authenticated user (hashed)
                 'role_id' => $validated['role_id'],      // Coming from the request
-                'is_active' => $validated['is_active'],  // Coming from the request
                 'invited_by' => $invitation->invited_by, // The ID of the inviter from the invitation
             ]);
     
