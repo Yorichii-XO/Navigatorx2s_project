@@ -28,26 +28,29 @@ class UserController extends Controller
         return view('users.create', compact('roles'));
     }
 
-    // Store a newly created user in storage
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
-            'role_id' => 'required|exists:roles,id',
-        ]);
+   // Store a newly created user in storage
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|string|min:8|confirmed',
+        'role_id' => 'required|exists:roles,id',
+    ]);
 
-        User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-            'role_id' => $validated['role_id'],
-            'is_active' => false, // Default to inactive when created
-        ]);
+    // Create the user using the validated data
+    $user = User::create([
+        'name' => $validated['name'],
+        'email' => $validated['email'],
+        'password' => bcrypt($validated['password']),
+        'role_id' => $validated['role_id'],
+        'is_active' => false, // Default to inactive when created
+    ]);
 
-        return redirect()->route('users.index');
-    }
+    // Return the newly created user as a JSON response
+    return response()->json($user, 201); // 201 Created status code
+}
+
 
     public function show($id)
     {
@@ -95,7 +98,11 @@ class UserController extends Controller
             'is_active' => $validated['is_active'], // Update active status
         ]);
 
-        return redirect()->route('users.index');
+  // Return JSON response with user and roles data
+  return response()->json([
+    'user' => $user,
+   
+]);
     }
 
     // Remove the specified user from storage

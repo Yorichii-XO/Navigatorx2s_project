@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 Route::post('/register', [RegisterController::class, 'register']);
 Route::post('/login', [ApiController::class, 'login']);
 //Users
@@ -31,6 +32,8 @@ Route::middleware('auth:sanctum')->get('/users/{user}/edit', [UserController::cl
 Route::get('/users/{id}', [UserController::class, 'show'])->middleware('auth:sanctum'); // Get user by ID
 Route::put('/users/{id}', [UserController::class, 'update'])->middleware('auth:sanctum'); // Get user by ID
 Route::get('/user', [UserController::class, 'showProfile'])->middleware('auth:sanctum'); // Get user by ID
+Route::post('/users', [UserController::class, 'store'])->middleware('auth:sanctum'); // Get user by ID
+
 Route::middleware('auth:sanctum')->put('/user', [UserController::class, 'updateprofile']);
 
 Route::delete('/users/{id}', [UserController::class, 'destroy'])->middleware('auth:sanctum'); // Get user by ID
@@ -50,12 +53,6 @@ Route::get('/youractivities', [ActivityController::class, 'showUserActivities'])
 Route::post('/logout', [ApiController::class, 'logout'])->middleware('auth:sanctum');
 
 
-// TimeEntry routesRoute::middleware('auth:sanctum')->get('/activities/stop', [ActivityController::class, 'index']);
-
-
-Route::middleware('auth:sanctum')->post('/time-entries', [TimeEntryController::class, 'store']);
-Route::middleware('auth:sanctum')->post('/time-entries/{id}/end', [TimeEntryController::class, 'end']);
-Route::middleware('auth:sanctum')->get('/time-entries', [TimeEntryController::class, 'index']);
 
 // Notification routes
 Route::middleware('auth:sanctum')->get('/notifications', [NotificationController::class, 'index']);
@@ -68,21 +65,30 @@ Route::get('/url-visits', [UrlVisitController::class, 'index'])->middleware('aut
 Route::post('/url-analyze', [UrlVisitController::class, 'analyzeUrl'])->middleware('auth:sanctum');
 
 
-Route::get('/members', [MemberController::class, 'index'])->middleware('auth:sanctum');
 Route::post('/invite', [InvitationController::class, 'invite'])->middleware('auth:sanctum');
+Route::delete('/invitations/{id}', [InvitationController::class, 'deleteInvitation'])->middleware('auth:sanctum');
+
 Route::get('/invitations', [InvitationController::class, 'index'])->middleware('auth:sanctum');
- // Route to accept an invitation by invitation ID
+// Route to accept an invitation by invitation ID
 // In routes/api.php
 Route::middleware('auth:sanctum')->post('/invitations/{id}/accept', [InvitationController::class, 'acceptInvitation']);
-    
- // Route to delete an invitation by invitation ID
- Route::delete('/invitations/{id}', [InvitationController::class, 'deleteInvitation'])->middleware('auth:sanctum');
 
- Route::middleware('auth:sanctum')->get('/members', [MemberController::class, 'index']);
- Route::post('/members', [MemberController::class, 'store']);
+// Route to delete an invitation by invitation ID
 
- Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->get('/members', [MemberController::class, 'index']);
+Route::post('/members', [MemberController::class, 'store']);
+
+Route::middleware('auth:sanctum')->group(function () {
     Route::get('members/{id}', [MemberController::class, 'edit']);
     Route::put('members/{id}', [MemberController::class, 'update']);
     Route::delete('/members/{id}', [MemberController::class, 'deleteMember']);
+});
+Route::get('/members', [MemberController::class, 'index'])->middleware('auth:sanctum');
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/roles', [RoleController::class, 'index']);
+    Route::post('/roles', [RoleController::class, 'store']);
+    Route::get('/roles/{id}', [RoleController::class, 'edit']);
+    Route::put('/roles/{id}', [RoleController::class, 'update']);
+    Route::delete('/roles/{id}', [RoleController::class, 'destroy']);
 });
